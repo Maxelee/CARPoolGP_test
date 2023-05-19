@@ -80,8 +80,8 @@ class GPMixture(kernels.Kernel):
         self.delta_p = jnp.atleast_1d(delta_p)
 
     def evaluate(self, X1, X2):
-        x = jnp.atleast_1d(jnp.sqrt((X2 - X1 + self.delta_p)**2))
-        return jnp.sum(self.amp * jnp.exp(-x**2*self.tau))
+        x = jnp.atleast_1d(jnp.sqrt((X2 - X1)**2))
+        return jnp.prod(self.amp * jnp.exp(-x**2*self.tau+self.delta_p))
 
 
 def build_I(N):
@@ -107,19 +107,13 @@ class Mkernel(kernels.Kernel):
 
     def evaluate(self, X1, X2):
         x = jnp.atleast_1d(jnp.sqrt((X2 - X1)**2))
-        return jnp.sum(jnp.exp(-self.p * x))
+        return jnp.prod(jnp.exp(-self.p * x))
 
 
 def get_GPMixture(params):
-    try:
-        K = GPMixture(
-            jnp.exp(params["log_amp"]),
-            jnp.exp(params["log_tau"]),
-            jnp.exp(params["log_p"]))
-    except:
-        K = GPMixture(
-            jnp.exp(params["log_amp"]),
-            jnp.exp(params["log_tau"]))
+    K = GPMixture(
+        jnp.exp(params["log_amp"]),
+        jnp.exp(params["log_tau"]))
     return K
 
 

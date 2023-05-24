@@ -46,7 +46,8 @@ def fit_CP(theta, theta_R, data, surrogate_data, return_all=False, iters=500):
         "log_amp":jnp.ones(7),
         "log_tau":jnp.ones(7),
         "log_jitter":-1.0,
-        "log_pl":np.zeros(7)}
+        "log_pl":np.zeros(7), 
+        "mean":0.0}
 
     kernel_func =  jax.tree_util.Partial(get_GPMixture)
 
@@ -87,7 +88,7 @@ def predict_CP(paramsCP, theta, theta_R, data, surrogate_data, test_theta):
     pred_cov = kernel(np.concatenate((test_theta.T, theta_QR)), np.concatenate((test_theta.T, theta_QR)))
 
     # Predict the mean and cov
-    pred_meanCP, pred_varCP = predict(QR, cov, pred_cov, 0)
+    pred_meanCP, pred_varCP = predict(QR, cov, pred_cov, paramsCP["mean"])
     return pred_meanCP, pred_varCP
 
 
